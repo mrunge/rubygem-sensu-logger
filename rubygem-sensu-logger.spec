@@ -2,7 +2,7 @@
 %global gem_name sensu-logger
 
 Name:           rubygem-%{gem_name}
-Version:        1.1.0
+Version:        1.2.0
 Release:        1%{?dist}
 Summary:        The Sensu logger library
 Group:          Development/Languages
@@ -15,11 +15,10 @@ BuildRequires:  rubygems-devel
 BuildRequires:  ruby
 BuildRequires:  rubygem(rspec)
 BuildRequires:  rubygem(eventmachine)
-BuildRequires:  rubygem(sensu-em)
-BuildRequires:  rubygem(multi_json)
+BuildRequires:  rubygem(sensu-json)
 
 Requires:       rubygem(eventmachine)
-Requires:       rubygem(sensu-em)
+Requires:       rubygem(sensu-json)
 
 BuildArch:      noarch
 %if 0%{?fedora} <= 20 || 0%{?el7}
@@ -86,6 +85,9 @@ popd
 %{gem_instdir}/Rakefile
 
 %changelog
+* Thu May 05 2016 Martin Mágr <mmagr@redhat.com> -  1.2.0-1
+- Updated to upstream version 1.2.0
+
 * Fri Feb 26 2016 Martin Mágr <mmagr@redhat.com> -  1.1.0-1
 - Updated to upstream version 1.1.0
 
