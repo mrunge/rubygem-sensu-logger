@@ -2,13 +2,14 @@
 %global gem_name sensu-logger
 
 Name:           rubygem-%{gem_name}
-Version:        1.2.0
+Version:        1.2.1
 Release:        1%{?dist}
 Summary:        The Sensu logger library
 Group:          Development/Languages
 License:        MIT
 URL:            https://github.com/sensu/sensu-logger
 Source0:        https://rubygems.org/gems/%{gem_name}-%{version}.gem
+Source1:        https://github.com/sensu/%{gem_name}/archive/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 
 BuildRequires:  ruby(release)
 BuildRequires:  rubygems-devel
@@ -21,7 +22,7 @@ Requires:       rubygem(eventmachine)
 Requires:       rubygem(sensu-json)
 
 BuildArch:      noarch
-%if 0%{?fedora} <= 20 || 0%{?el7}
+%if 0%{?rhel}
 Provides:       rubygem(%{gem_name}) = %{version}
 %endif
 
@@ -40,10 +41,9 @@ Documentation for %{name}.
 
 %prep
 gem unpack %{SOURCE0}
-
 %setup -q -D -T -n  %{gem_name}-%{version}
-
 gem spec %{SOURCE0} -l --ruby > %{gem_name}.gemspec
+tar -xzf %{SOURCE1}
 
 %build
 # Create the gem as gem install only works on a gem file
@@ -57,6 +57,9 @@ gem build %{gem_name}.gemspec
 mkdir -p %{buildroot}%{gem_dir}
 cp -a .%{gem_dir}/* \
         %{buildroot}%{gem_dir}/
+
+install -d -p %{_builddir}%{gem_instdir}
+tar -xvzf %{SOURCE1} -C %{_builddir}/%{gem_name}-%{version}/%{gem_instdir} --strip-components=1 %{gem_name}-%{version}/spec
 
 rm -f %{buildroot}%{gem_instdir}/{.gitignore,.travis.yml}
 
@@ -76,15 +79,15 @@ popd
 %{gem_spec}
 %doc %{gem_instdir}/README.md
 %doc %{gem_instdir}/LICENSE.txt
-%doc %{gem_instdir}/Gemfile
 
 %files doc
 %doc %{gem_docdir}
-%{gem_instdir}/spec
 %{gem_instdir}/%{gem_name}.gemspec
-%{gem_instdir}/Rakefile
 
 %changelog
+* Thu Dec 22 2016 Martin Mágr <mmagr@redhat.com> -  1.2.1-1
+- Updated to upstream version 1.2.1
+
 * Thu May 05 2016 Martin Mágr <mmagr@redhat.com> -  1.2.0-1
 - Updated to upstream version 1.2.0
 
