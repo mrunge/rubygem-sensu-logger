@@ -41,9 +41,13 @@ Documentation for %{name}.
 
 %prep
 gem unpack %{SOURCE0}
+%if 0%{?dlrn} > 0
+%setup -q -D -T -n  %{dlrn_nvr}
+%else
 %setup -q -D -T -n  %{gem_name}-%{version}
+%endif
 gem spec %{SOURCE0} -l --ruby > %{gem_name}.gemspec
-tar -xzf %{SOURCE1}
+
 
 %build
 # Create the gem as gem install only works on a gem file
@@ -53,13 +57,18 @@ gem build %{gem_name}.gemspec
 # by default, so that we can move it into the buildroot in %%install
 %gem_install
 
+
 %install
 mkdir -p %{buildroot}%{gem_dir}
 cp -a .%{gem_dir}/* \
         %{buildroot}%{gem_dir}/
 
 install -d -p %{_builddir}%{gem_instdir}
+%if 0%{?dlrn} > 0
+tar -xvzf %{SOURCE1} -C %{_builddir}/%{dlrn_nvr}/%{gem_instdir} --strip-components=1 %{gem_name}-%{version}/spec
+%else
 tar -xvzf %{SOURCE1} -C %{_builddir}/%{gem_name}-%{version}/%{gem_instdir} --strip-components=1 %{gem_name}-%{version}/spec
+%endif
 
 rm -f %{buildroot}%{gem_instdir}/{.gitignore,.travis.yml}
 
@@ -72,6 +81,7 @@ sed -i /CodeClimate::TestReporter.start/d spec/helpers.rb
 rspec -Ilib spec
 popd
 
+
 %files
 %dir %{gem_instdir}
 %{gem_libdir}
@@ -83,6 +93,7 @@ popd
 %files doc
 %doc %{gem_docdir}
 %{gem_instdir}/%{gem_name}.gemspec
+
 
 %changelog
 * Thu Dec 22 2016 Martin Mágr <mmagr@redhat.com> -  1.2.1-1
